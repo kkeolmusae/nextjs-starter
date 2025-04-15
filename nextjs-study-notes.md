@@ -1,23 +1,20 @@
-# NestJs Study Notes
+# NextJs Study Notes
 공부 내용 정리
 
 ## 메모 및 정리
+- React = 라이브러리 / NextJs = 프레임워크
 - Next.js는 파일 기반 라우팅 시스템이다.
 - Application 의 라우팅을 처리하는 방식이 `App Router` 와 `Pages Router` 두가지가 있는데, `App Router`를 Next.js 13부터 도입(+권장)하고 있다.
-- 폴더 기반 라우팅을 사용하며, 각 폴더가 URL 경로와 매핑된다.
-
-
-### App Router 와 Pages Router 간단 비교
-
-| 항목                       | Pages Router                          | App Router                              |
-|----------------------------|---------------------------------------|----------------------------------------|
-| **폴더 위치**              | `pages/`                              | `app/`                                 |
-| **라우팅 방식**            | 파일 기반                             | 폴더 기반                              |
-| **React Server Components**| 미지원                                | 기본 지원                              |
-| **데이터 페칭 방식**        | `getServerSideProps`, etc.            | 서버 컴포넌트 내 직접 `fetch` 호출     |
-| **레이아웃 재사용**         | `_app.js`에서 구현                   | 기본 지원 (`layout.js`)                |
-| **로딩/에러 핸들링**        | 별도 구현 필요                        | 기본 지원 (`loading.js`, `error.js`)  |
-| **CSS 스타일링 옵션**       | CSS Module, 전역 CSS                 | CSS Module, 통합 스타일링 옵션(`@next/font`) |
+- 폴더 기반 라우팅을 사용하며, 각 폴더가 URL 경로와 매핑된다. (page.tsx )
+- `app/` 을 `Root Segment`라고 한다. (App Router에서 라우트 계층 구조의 시작점)
+- Nextjs에서 정해둔 규칙이 있기 때문에 정해진 파일명을 사용해야한다. (`page.tsx`, `layout.tsx`, `/app` 등)
+- CSR
+  - 평범한 React 가 렌더링 되는 방식은 CSR(Client Side Rendering) => 브라우저가 Rendering 작업을 함
+  - create-react-app 을 사용해서 react 만으로 application을 만드는건 Client Side Rendering
+  - React 는 사용자 브라우저인 Client 단에서 모든 렌더링을 수행해야함. (Client 가 사용자 브라우저에 UI를 구축해야 하는 것)
+- SSR
+  - Nextjs로 웹사이트를 빌드할 때는 기본적으로 SSR(Server Side Rendering)
+  - Nextjs application 의 모든 page 안의 component들은 우선 server에서 rendering함
 
 ### **구조 예시**
 ```
@@ -37,6 +34,7 @@ app/
 
 ### 용어 정리
 - Babel: 자바스크립트 Transpiler로 최신 js 문법(ES6+)을 구형 브라우저에서도 동작할 수 있도록 구버전 문법으로 바꿔줌
+- Rendering: Nextjs가 우리의 React component(js, ts) 를 가져와서 HTML 이 읽을 수 있는 형태로 변환해 주는 것 
 
 ### 디렉토리 구조
 public:	서빙할 정적 파일
@@ -61,6 +59,24 @@ public:	서빙할 정적 파일
 
 5. not-found.tsx
 - 404 페이지를 처리
+
+### Client Component, Server Component
+- `use client`
+  - `use client`를 써도 컴포넌트는 실제로 서버에서 rendering 된다.
+  - 모든 컴포넌트와 페이지들은 먼저 backend에서 rendering 된다.
+  - `use client`가 있어야 nextjs에서 이 컴포넌트는 client에서 interactive 해야한다는 것을 인식하고 hydrate 함
+  - backend에서 render되고 frontend 에서 hydrate 됨을 의미
+
+### Hydration
+- 단순 HTML 을 React Application 으로 초기화하는 작업
+- 모든 Comonpoent 에 대해서 hydration이 발생하는 것은 아님 (예외가 있음)
+- 
+  - 순서
+    - 1. 특정 path 로 접근하면
+    - 2. next js 는 그 요청을 보고 component 를 Dummy HTML 로 변환해서 사용자한테 전달
+    - 3. 사용자가 페이지에 도착하면 nextjs 는 load를 시작 (html에 react application 초기화)
+    - 4. react 가 app 을 넘겨 받음으로서 anchor(a태그)가 Link 로 변환됨
+    - 5. hard refresh 안쓰게됨?
 
 ## 주의사항
 1. nodejs version: Node.js 18.18 or later.
