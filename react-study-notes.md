@@ -1,6 +1,7 @@
 # React 공부
 - 기본베이스로 노마드코더 React 강의를 듣고, 부족한 부분은 docs 읽어보면서 정리
 - 컴포넌트의 첫 글자는 반드시 대문자여야 한다. (소문자면 React랑 JSX가 이걸 HTML 로 인식함)
+- 컴포넌트는 단지 jsx를 return 하는 function 일 뿐이다.
 - jsx에서는 js 에서 사용하는 `class` 나 `for` 과 같은 용어를 사용하지 못하기 때문에 `className` 과 `htmlFor` 등으로 바꿔서 사용해야한다.
 ```js
 // 아래 문법 형태를 사람들이 조금 더 선호함.
@@ -172,3 +173,89 @@ export default Button;
 // import { Button } from "./Button.js" 이 아니라
 // import Button from "./Button.js" 으로 중괄호 없이 가져올 수 있음.
 ```
+
+- useEffect
+  - 어떻게 특정 코드들이 첫번째 component render에서만 실행되게 하는지? (state가 바뀌어도 실행은 한번만) 
+  - useEffect는 2개의 argument를 가지는 function이다.
+  - 첫번째 argument는 딱 한번만 실행하고 싶은 코드
+```js
+function App() {
+  const [counter, setValue] = useState(0);
+  const [keyword, setKeyword] = useState("");
+  console.log("Run every time"); // state 가 변경될 때 마다 호출됨
+
+  const onClick = () => setValue((prev) => prev + 1);
+  const onChange = (event) => setKeyword(event.target.value); // keyword 값 변경
+
+  useEffect(() => {
+    console.log("I run only once.");
+  }, []); // 한번만 호출됨
+  useEffect(() => {
+    console.log("I run when 'keyword' changes.");
+  }, [keyword]); // keyword 가 변경될 때 마다 호출 
+  useEffect(() => {
+    console.log("I run when 'counter' changes.");
+  }, [counter]); // counter 가 변경될 때 마다 호출 
+  useEffect(() => {
+    console.log("I run when keyword & counter change");
+  }, [keyword, counter]); // counter 랑 keyword 가 변경될 때 마다 호출
+
+  return (
+    <div>
+      <input
+        value={keyword}
+        onChange={onChange} // input의 값이 변경될 때 마다 onChange 함수 호출 
+        type="text"
+        placeholder="Search here..."
+      />
+      <h1>{counter}</h1>
+      <button onClick={onClick}>click me</button>
+    </div>
+  );
+}
+```
+
+- Clean up
+  - Clean-up 함수는 useEffect 내부에서 컴포넌트가 언마운트되거나, 의존성 배열 값이 변경되기 전에 실행되는 함수다
+  - 주로 타이머 제거, 이벤트 리스너 해제, 구독 종료 같은 사이드 이펙트 정리 작업에 사용된다.
+	-	useEffect에서 return을 통해 정의할 수 있다.
+  - 그렇게 자주 사용하진 않지만, 알고 있으면 좋다.(특정 케이스에서만 사용한다.)
+```js
+import { useState, useEffect } from "react";
+
+function Hello() {
+  useEffect(function () {
+    console.log("hi :)");
+    return function () {
+      console.log("bye :(");
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("hi :)");
+    return () => console.log("bye :("); // Clean up function
+  }, []);
+  return <h1>Hello</h1>;
+}
+
+function App() {
+  const [showing, setShowing] = useState(false);
+  const onClick = () => setShowing((prev) => !prev);
+  return (
+    <div>
+      {showing ? <Hello /> : null}
+      <button onClick={onClick}>{showing ? "Hide" : "Show"}</button>
+    </div>
+  );
+}
+```
+
+- 마운트(Mount) / 언마운트(Unmount)
+  - 마운트
+    - 컴포넌트가 화면에 처음 나타나는 시점
+	  - React가 해당 컴포넌트를 생성하고 DOM에 삽입함
+	  - 이때 useEffect(() => { ... }, []) 같은 훅의 첫 번째 실행도 여기서 이뤄짐
+ - 언마운트
+   	-	컴포넌트가 화면에서 사라지는 시점
+    -	React가 해당 컴포넌트를 DOM에서 제거함
+    -	이때 useEffect 안에 있는 clean-up 함수가 실행됨
