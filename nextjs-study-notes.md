@@ -76,7 +76,99 @@ public:	서빙할 정적 파일
     - 2. next js 는 그 요청을 보고 component 를 Dummy HTML 로 변환해서 사용자한테 전달
     - 3. 사용자가 페이지에 도착하면 nextjs 는 load를 시작 (html에 react application 초기화)
     - 4. react 가 app 을 넘겨 받음으로서 anchor(a태그)가 Link 로 변환됨
-    - 5. hard refresh 안쓰게됨?
+    - 5. `use client` 가 적힌 컴포넌트가 hydrate 됨 (eventListner를 추가하고 interactive 하게 바뀜)
+
+
+### layout.tsx
+- 화면이 렌더링될때 
+  - next js는 우선 layout component로 가서 export된 default component 를 렌더링함
+  - 그 다음에 URL을 확인해서 어떤 컴포넌트를 렌더링 해야하는지 인식하고 렌더링함
+  - layout.tsx에서 Layout 컴포넌트의 매개변수(children)은 Layout 내부에 표현될 컴포넌트임
+- 상위 폴더에 layout.tsx가 있으면 하위 폴더의 컴포넌트에 동일하게 적용한다.
+
+### Route Groups
+- Route Groups는 routes들을 그룹화해서 logical groups으로 만들 수 있는 기능이 있다.
+- 루트 레이아웃을 사용하지 않고 여러 레이아웃을 사용하게 할 수도 있다. (레이아웃 선택 및 해제도 가능)
+- Route Groups 는 폴더이름을 소괄호`()`를 사용해서 묶어줘야한다.
+- 폴더 이름을 괄호로 생성한 경우 URL 에 전현 영향을 미치지 않는다.
+
+### Metadata
+- Page 의 head 부분에 표시된다.
+- Metadata은 병합될 수 있다.
+- Page.tsx 랑 Layout.tsx만 메타데이터를 내보낼 수 있다.
+- 서버 컴포넌트에서만 있을 수 있다.
+- 템플릿도 만들 수 있다.
+
+### Dynamic Routes
+- movies 라는 폴더에 [id] 와 같이 대괄호`[]`로 폴더명을 만들어주면 /movies/1, /movies/123 와 같이 이동할때 동작한다.
+- Nextjs 15버전부터는 params, searchParams 는 promise 이다. (https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes)
+
+### Date Fetch
+```js
+// react fetch => client에서 fetch함, useState/Effect 때문에 "use client" 사용(클라이언트 컴포넌트) -> metadata 설정 불가
+"use client";
+
+import { useEffect, useState } from "react";
+
+export default function Home() {
+  const [movies, setMovies] = useState([]);
+  let [isLoading, setIsLoading] = useState(true);
+  const getMovies = async () => {
+    const response = await fetch("https://nomad-movies.nomadcoders.workers.dev/movies");
+    const json = await response.json();
+    setMovies(json);
+    setIsLoading(false);
+  };
+  useEffect(() => {
+    getMovies();
+  }, []);
+  return (
+    <div>
+      <h1>Home</h1>
+      {isLoading ? "Loading..." : JSON.stringify(movies)}
+    </div>
+  );
+}
+```
+
+```js
+// nextjs 서버 컴포넌트에서의 fetch => 간단하고 Metadata 설정 가능
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home",
+};
+
+const URL = "https://nomad-movies.nomadcoders.workers.dev/movies";
+
+async function getMovies() {
+  const response = await fetch(URL);
+  const json = await response.json();
+  return json;
+}
+
+export default async function HomePage() {
+  const movies = await getMovies();
+  return (
+    <div>
+      <h1>Home</h1>
+      {JSON.stringify(movies)}
+    </div>
+  );
+}
+```
+
+### loading.tsx
+- loading 페이지는 `loading.tsx` 에 만들면 자동으로 쓰인다?
+- backend 에서 streaming 하기 떄문에 가능하다?
+
+### error.tsx
+- error 발생했때 error.tsx 가 있으면 이 컴포넌트를 보여준다.
+
+### suspense 
+- 데이터를 fetch하기 위해 <Suspense> 안의 컴포넌트를 await 한다.
+- Promise.all로 여러 api를 병렬로 가져오려고 하게되면 둘다 성공할때까지 같이 기다리는데
+- api 호출을 각각의 component 로 나눈 다음에 Suspense 를 사용해서 각 컴포넌트를 호출하면 먼저 데이터를 가져오는건 먼저 화면에보여준다. (성능 최적화)
 
 ## 주의사항
 1. nodejs version: Node.js 18.18 or later.
