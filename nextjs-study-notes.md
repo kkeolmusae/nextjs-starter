@@ -170,6 +170,23 @@ export default async function HomePage() {
 - Promise.all로 여러 api를 병렬로 가져오려고 하게되면 둘다 성공할때까지 같이 기다리는데
 - api 호출을 각각의 component 로 나눈 다음에 Suspense 를 사용해서 각 컴포넌트를 호출하면 먼저 데이터를 가져오는건 먼저 화면에보여준다. (성능 최적화)
 
+## Css
+### global css 
+- `global.css` 로 만들면 됨
+- 일반적인 것 (전체에 적용되는 것)은 모두 여기에 작성하자
+
+### module css
+- `*.module.css` 로 만들면 됨
+- `*.module.css` 를 js 파일인 것 처럼 import 하고, css 를 적용해줄때 `<nav className ={style.nav}>` 이렇게 호출한다
+- 이렇게 호출하는게 이상해보일수는 있는데 이렇게 하면 class name 충돌이 없다는 장점이 있다.
+```css
+/* css를 js 처럼 사용하고 .nav는 class name 이다. */
+.nav { 
+  background-color: red;
+  padding: 50px 100px;
+}
+```
+
 ## 주의사항
 1. nodejs version: Node.js 18.18 or later.
 ```shell
