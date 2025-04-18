@@ -50,6 +50,7 @@ public:	서빙할 정적 파일
 - 특정 경로에 대한 UI를 정의하며, 라우트의 끝점(leaf node)으로 작동한다.
 - `app/page.tsx`: 루트 경로(`/`)의 페이지를 정의
 - `app/dashboard/page.tsx`: `/dashboard` 경로의 페이지를 정의
+- 아무거나 export 못하고 허용된 것만 export 가능함.
 
 3. loading.tsx
 - 로딩 상태를 처리
@@ -169,6 +170,13 @@ export default async function HomePage() {
 - 데이터를 fetch하기 위해 <Suspense> 안의 컴포넌트를 await 한다.
 - Promise.all로 여러 api를 병렬로 가져오려고 하게되면 둘다 성공할때까지 같이 기다리는데
 - api 호출을 각각의 component 로 나눈 다음에 Suspense 를 사용해서 각 컴포넌트를 호출하면 먼저 데이터를 가져오는건 먼저 화면에보여준다. (성능 최적화)
+  
+### Generate Metadata
+- 동적일 수 있는 metadata를 불러오기 위해 자동으로 호출한다.
+- 프레임워크가 이함수를 찾을 수 있어야 하기 떄문에 `export` 명시 필요
+- `generateMetadata` 로 만들면 됨
+- page component가 params의 url id 를 props로 받는 것 처럼 generateMetadata 도 동일하게 받는다. (/app/(movies)/movies/[id]/page.tsx)
+- https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
 
 ## Css
 ### global css 
