@@ -178,6 +178,10 @@ export default async function HomePage() {
 - page component가 params의 url id 를 props로 받는 것 처럼 generateMetadata 도 동일하게 받는다. (/app/(movies)/movies/[id]/page.tsx)
 - https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
 
+### prefetch
+- NextJs에 페이지를 미리 로드할 수 있게 함
+- 모든 페이지에 하면 API 혹은 DB에 과부하를 줄 수 있음.
+
 ## Css
 ### global css 
 - `global.css` 로 만들면 됨
